@@ -63,10 +63,15 @@ class AutoRec(keras.Model):
 
 def MaskedMSELoss(y_true,y_pred):
     mask = y_true != 0
+    #마스크 : 관측된 데이터에 대해서는 1, 관측되지 않은데이터는 0
     mask_float = tf.cast(mask,tf.float32)
-    masked_error = mask_float*y_pred - y_true
-    squared_masked_error = tf.square(masked_error) / 2
-    return squared_masked_error
+    masked_error = tf.reduce_mean(tf.pow(tf.subtract(mask_float * y_pred,y_true),2))
+    #기존에 관측되지 않았던 결과에 대해서는 마스킹을 진행하여 Loss 계산
+    return masked_error
+
+
+    cost2 = tf.reduce_sum(tf.pow(predicted-Y, 2))/(num_instances)
+
 
 if __name__ == "__main__":
     args = parse_args()
